@@ -5,3 +5,9 @@
 # Java build output
 out/
 
+#C# misc files
+obj/
+bin/
+
+#VSC files
+*.code-workspace
