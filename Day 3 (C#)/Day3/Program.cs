@@ -26,8 +26,7 @@ class Day3
             if (task == 1) {
                 TaskOne(filePath);
             } else {
-                Console.WriteLine("Task two not implemented yet.");
-                return;
+                TaskTwo(filePath);
             }
 
 
@@ -88,13 +87,40 @@ class Day3
                     break;
                 }
             }
-            char[] numberAsCharArray = chars.ToArray();
-            string numberAsString = new string(numberAsCharArray);
-            int add = int.Parse(numberAsString);
+            int add = CharListToInt(chars);
             ret += add;
             //Console.WriteLine(add);
         }
         Console.WriteLine($"Final result: {ret}");
+    }
+
+    static void TaskTwo(string filePath) 
+    {
+        //convert the input file to a char[][] array
+        char[][] arr = InputToArray(filePath);
+
+        if (arr == null)
+        {
+            Console.WriteLine("Retrieving input failed. Exiting");
+            return;
+        }
+        //a list of ((row,col)(row,col)) tuples storing the starting coordinates of number pairs we'll read and multiply later
+        List<(int,int)> numberStartIndicePairs = [];
+        for (int row = 0; row < arr.Length; row++) 
+        {
+            for (int col = 0; col < arr[row].Length; col++)
+            {
+                bool indexIsAsterisk = arr[row][col] == '*';
+                if (indexIsAsterisk)
+                {
+
+                    if (NumberHasSpecials(arr, row, col))
+                    {
+                        return;
+                    }
+                }
+            }
+        }
     }
                     
         /*
@@ -252,5 +278,89 @@ class Day3
             return true;
         }
         return false;
+    }
+
+    public static int gearValue(char[][] arr, int row, int col)
+    {
+        //Check an asterisk in the array to see if it has exactly two adjacent numbers; if so, return those multiplied; otherwise, return 0
+        int[] adjacentColumns = [col-1, col+1];
+        int[] subRows = [row-1, row+1]; //lets us iterate over the row above and below the current one. We check later whether these rows are out of bounds
+
+        return 0;
+    }
+
+    public static int getNumber(char[][] arr, int row, int col)
+    {
+        //Given the (row,col) indices of a digit, return that digit's number
+
+
+        //first we need to find the entire number in the array
+
+        int startCol = GetFirstIndexOfNumber(arr, row, col);
+
+        int endCol = GetLastIndexOfNumber(arr, row, startCol);
+
+        List<char> chars = [];
+        for (int i = startCol; i < endCol + 1; i++)
+        //retrieve the whole number
+        {
+            chars.Add(arr[row][i]);
+        }
+        return 0;
+
+
+
+        
+    }
+
+    public static int GetFirstIndexOfNumber(char[][] arr, int row, int col)
+    {
+        int startCol = col;
+
+        while (startCol > 0) {
+            if (Char.IsDigit(arr[row][startCol]))
+            {
+                //decrement current column if it's a digit
+                startCol--;
+            } else 
+            {
+                //otherwise bring it back to a digit and break
+                startCol++;
+                break;
+            }
+        }
+        startCol = AocReusableUtilities.AocReusableUtilities.Clamp(startCol, 0, arr[row].Length); //clamp to bounds in case startCol is -1
+
+        return startCol;
+    }
+
+    public static int GetLastIndexOfNumber(char[][] arr, int row, int col)
+    {
+        int endCol = col;
+        while (endCol < arr[row].Length) 
+        {
+            if (Char.IsDigit(arr[row][endCol]))
+            {
+                //increment column if it's a digit
+                endCol++;
+            } else
+            {
+                //otherwise bring it back to a digit and break
+                endCol--;
+                break;
+            }
+        }
+
+        endCol = AocReusableUtilities.AocReusableUtilities.Clamp(endCol, 0, arr[row].Length); //clamp to bounds in case endCol == length
+
+        return endCol;
+    }
+
+    public static int CharListToInt(List<char> chars) {
+        //convert a List<char> to an int. Assumes all contents are numbers, you've fucked up otherwise
+        char[] numberAsCharArray = chars.ToArray();
+        string numberAsString = new string(numberAsCharArray);
+        int ret = int.Parse(numberAsString);
+        return ret;
     }
 }
