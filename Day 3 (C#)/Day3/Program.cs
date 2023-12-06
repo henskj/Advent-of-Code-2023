@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
+using System.Data;
 using System.IO;
+using System.Numerics;
 using System.Runtime.Versioning;
 using System.Text;
 using AocReusableUtilities;
@@ -49,6 +51,57 @@ class Day3
             return;
         }
         List<(int,int)> numberStartIndices = []; //a list of (row,col) tuples storing the starting coordinate of numbers we'll read and sum later
+        bool skip = false; //set to true when a number is found to not check it more than onec
+        for (int row = 0; row < arr.Length; row++) 
+        {
+            for (int col = 0; col < arr[row].Length; col++)
+            {
+                bool indexIsDigit = Char.IsDigit(arr[row][col]);
+                if (indexIsDigit && !skip)
+                {
+                    if (NumberHasSpecials(arr, row, col))
+                    {
+                        numberStartIndices.Add((row, col));
+                        skip = true;
+                    }
+                } else if (!indexIsDigit)
+                {
+                    skip = false;
+                }
+            }
+        }
+        int ret = 0;
+        List<char> chars;
+        foreach ((int,int) tup in numberStartIndices) {
+            Console.WriteLine(tup);
+            chars = [];
+            int row = tup.Item1;
+            int col = tup.Item2;
+            while (Char.IsDigit(arr[row][col]))
+            {
+                chars.Add(arr[row][col]);
+                if (col < arr[row].Length - 1)
+                {
+                    col++;
+                } else
+                {
+                    break;
+                }
+            }
+            char[] numberAsCharArray = chars.ToArray();
+            string numberAsString = new string(numberAsCharArray);
+            int add = int.Parse(numberAsString);
+            ret += add;
+            Console.WriteLine(add);
+        }
+        Console.WriteLine($"Final result: {ret}");
+    }
+                    
+        /*
+
+        Earlier algorithm. Realised after writing that it is stupid. This version checked around all special characters; better to check around all numbers
+        to avoid redoing work.
+
         for (int row = 0; row < arr.Length; row++) 
         {
             for (int col = 0; col < arr[row].Length; col++)
@@ -83,21 +136,25 @@ class Day3
                 }
             }
         }
+        
         foreach ((int,int) tup in numberStartIndices) {
             Console.WriteLine(tup);
         }
+        
 
     }
-    static char[][] InputToArray(string filePath) 
+    */
+    public static char[][] InputToArray(string filePath) 
     {
         //Converts the text file input to an array of chars. Returns null if an error is raised.
         char[][] retArray;
         try
         {
             // Open a reader - errors are handled in the function for better readability here, see GetFileReader in the general C# utilities folder.
-            using (StreamReader reader = GetFileReader.OpenFileReader(filePath))
+            using (StreamReader reader = AocReusableUtilities.AocReusableUtilities.OpenFileReader(filePath))
             {
                 (int rows, int columns) = GetDimensions(reader);
+                Console.WriteLine($"Dimensions determined to be ({rows},{columns})");
                 reader.BaseStream.Position = 0; //reset the reader instead of making a new one
                 reader.DiscardBufferedData();
                 string line;
@@ -134,5 +191,66 @@ class Day3
         }
         return (rows,columns);
 
+    }
+
+    public static bool NumberHasSpecials (char[][] arr, int row, int col)
+    {
+        //Check a number in the array to see if it has an adjacent special character; return true if so, otherwise false
+        //when we find a digit, we want to determine the size of the number it belongs to
+        //then we want to search indices around said number's area until we find a special character
+        //when we do, we can break, which is much faster and simpler than the commented-out algo
+
+        int startCol = col; //first column index of our number, inclusive
+        int endCol = col; //last column index of our number, exclusive
+        int[] subRows = [row-1, row+1]; //lets us iterate over the row above and below the current one. We check later whether these rows are out of bounds
+        Console.WriteLine($"Beginning at ({row},{startCol})");
+        while (Char.IsDigit(arr[row][endCol]))
+        {
+            //increment endCol until its index is no longer a number or we hit the final index
+            if (endCol < arr[row].Length-1)
+            {
+                endCol++;
+            } else
+            {
+                break;
+            }
+        }
+        int[] adjacentCols = [startCol-1, endCol];
+        Console.WriteLine($"Adjacent columns are {adjacentCols[0]} and {adjacentCols[1]}");
+        foreach (int subCol in adjacentCols) {
+            int clampedCol = AocReusableUtilities.AocReusableUtilities.Clamp(subCol, 0, arr[row].Length-1); //clamp the column number to be in bounds
+            Console.WriteLine($"Checking at ({row},{clampedCol})");
+            char character = arr[row][clampedCol];
+            if (IsSpecial(character)) //check if the char is a special character other than .
+            {
+                return true;
+            }
+            
+        }
+        foreach (int subRow in subRows)
+        {
+            int clampedRow = AocReusableUtilities.AocReusableUtilities.Clamp(subRow, 0, arr.Length-1); //clamp the row number to be in bounds
+            
+            for (int i = AocReusableUtilities.AocReusableUtilities.Clamp(startCol-1, 0, arr[row].Length-1); i < endCol + 1; i++)
+            {
+                Console.WriteLine($"Checking at ({clampedRow},{i}); last is {endCol + 1}");
+                char character = arr[clampedRow][i];
+                if (IsSpecial(character)) //check if the char is a special character other than .
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static bool IsSpecial(char character)
+    {
+        int asciiVal = (int) character; //cast char to int to get ASCII value
+        if (!Char.IsDigit(character) && !Char.IsLetter(character) && asciiVal != 46)
+        {
+            return true;
+        }
+        return false;
     }
 }

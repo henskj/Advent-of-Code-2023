@@ -3,7 +3,7 @@ using System.IO;
 
 namespace AocReusableUtilities
 {
-    public static class GetFileReader
+    public static class AocReusableUtilities
     {
         public static StreamReader OpenFileReader(string filePath)
         {
@@ -25,6 +25,14 @@ namespace AocReusableUtilities
             }
 
             return new StreamReader(file.OpenRead());
+        }
+
+        public static int Clamp(int n, int min, int max) 
+        {
+            //clamps a specified int to within specified bounds
+            if (n < min) return min;
+            if (n > max) return max;
+            return n;
         }
     }
 }
