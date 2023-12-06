@@ -91,7 +91,7 @@ class Day3
             ret += add;
             //Console.WriteLine(add);
         }
-        Console.WriteLine($"Final result: {ret}");
+        Console.WriteLine($"Final result for task 1 of day 3: {ret}");
     }
 
     static void TaskTwo(string filePath) 
@@ -104,8 +104,7 @@ class Day3
             Console.WriteLine("Retrieving input failed. Exiting");
             return;
         }
-        //a list of ((row,col)(row,col)) tuples storing the starting coordinates of number pairs we'll read and multiply later
-        List<(int,int)> numberStartIndicePairs = [];
+        int result = 0; //we add to this as we find gears
         for (int row = 0; row < arr.Length; row++) 
         {
             for (int col = 0; col < arr[row].Length; col++)
@@ -113,14 +112,16 @@ class Day3
                 bool indexIsAsterisk = arr[row][col] == '*';
                 if (indexIsAsterisk)
                 {
-
-                    if (NumberHasSpecials(arr, row, col))
-                    {
-                        return;
-                    }
+                    result += GearValue(arr, row, col);
                 }
             }
         }
+        Console.WriteLine($"Final result for task 2 of day 3: {result}");
+    }
+
+    static void Test()
+    {
+
     }
                     
         /*
@@ -280,16 +281,60 @@ class Day3
         return false;
     }
 
-    public static int gearValue(char[][] arr, int row, int col)
+    public static int GearValue(char[][] arr, int row, int col)
     {
         //Check an asterisk in the array to see if it has exactly two adjacent numbers; if so, return those multiplied; otherwise, return 0
         int[] adjacentColumns = [col-1, col+1];
         int[] subRows = [row-1, row+1]; //lets us iterate over the row above and below the current one. We check later whether these rows are out of bounds
+        List<(int,int)> numCoords = [];
+        int numbersFound = 0; //we exit early if this exceeds 2
+        foreach (int adj in adjacentColumns)
+        {
+            if (Char.IsDigit(arr[row][adj]))
+            {
+                numCoords.Add((row,adj));
+                numbersFound++;
+            }
+        }
 
+        foreach (int subRow in subRows)
+        {
+            bool lastColumnWasDigit = false;
+            for (int subCol = col-1; subCol < col+2; subCol++)
+            {
+                if (char.IsDigit(arr[subRow][subCol]))
+                {
+                    if (!lastColumnWasDigit)
+                    {
+                        numCoords.Add((subRow,subCol));
+                        numbersFound++;
+                        lastColumnWasDigit = true;
+                    } 
+                    else
+                    {
+                        lastColumnWasDigit = true;
+                    }
+                }
+                else
+                {
+                    lastColumnWasDigit = false;
+                }
+                if (numbersFound > 2)
+                {
+                    return 0;
+                }
+            }
+        }
+        if (numbersFound == 2)
+        {
+            int num1 = GetNumber(arr, numCoords[0].Item1, numCoords[0].Item2);
+            int num2 = GetNumber(arr, numCoords[1].Item1, numCoords[1].Item2);
+            return num1 * num2;
+        }
         return 0;
     }
 
-    public static int getNumber(char[][] arr, int row, int col)
+    public static int GetNumber(char[][] arr, int row, int col)
     {
         //Given the (row,col) indices of a digit, return that digit's number
 
@@ -306,18 +351,14 @@ class Day3
         {
             chars.Add(arr[row][i]);
         }
-        return 0;
-
-
-
-        
+        return CharListToInt(chars);
     }
 
     public static int GetFirstIndexOfNumber(char[][] arr, int row, int col)
     {
         int startCol = col;
 
-        while (startCol > 0) {
+        while (startCol > -1) {
             if (Char.IsDigit(arr[row][startCol]))
             {
                 //decrement current column if it's a digit
@@ -351,7 +392,7 @@ class Day3
             }
         }
 
-        endCol = AocReusableUtilities.AocReusableUtilities.Clamp(endCol, 0, arr[row].Length); //clamp to bounds in case endCol == length
+        endCol = AocReusableUtilities.AocReusableUtilities.Clamp(endCol, 0, arr[row].Length - 1); //clamp to bounds in case endCol == length
 
         return endCol;
     }
