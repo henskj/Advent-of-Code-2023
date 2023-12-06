@@ -73,7 +73,7 @@ class Day3
         int ret = 0;
         List<char> chars;
         foreach ((int,int) tup in numberStartIndices) {
-            Console.WriteLine(tup);
+            //Console.WriteLine(tup);
             chars = [];
             int row = tup.Item1;
             int col = tup.Item2;
@@ -92,7 +92,7 @@ class Day3
             string numberAsString = new string(numberAsCharArray);
             int add = int.Parse(numberAsString);
             ret += add;
-            Console.WriteLine(add);
+            //Console.WriteLine(add);
         }
         Console.WriteLine($"Final result: {ret}");
     }
@@ -154,7 +154,7 @@ class Day3
             using (StreamReader reader = AocReusableUtilities.AocReusableUtilities.OpenFileReader(filePath))
             {
                 (int rows, int columns) = GetDimensions(reader);
-                Console.WriteLine($"Dimensions determined to be ({rows},{columns})");
+                //Console.WriteLine($"Dimensions determined to be ({rows},{columns})");
                 reader.BaseStream.Position = 0; //reset the reader instead of making a new one
                 reader.DiscardBufferedData();
                 string line;
@@ -203,7 +203,7 @@ class Day3
         int startCol = col; //first column index of our number, inclusive
         int endCol = col; //last column index of our number, exclusive
         int[] subRows = [row-1, row+1]; //lets us iterate over the row above and below the current one. We check later whether these rows are out of bounds
-        Console.WriteLine($"Beginning at ({row},{startCol})");
+        //Console.WriteLine($"Beginning at ({row},{startCol})");
         while (Char.IsDigit(arr[row][endCol]))
         {
             //increment endCol until its index is no longer a number or we hit the final index
@@ -216,10 +216,10 @@ class Day3
             }
         }
         int[] adjacentCols = [startCol-1, endCol];
-        Console.WriteLine($"Adjacent columns are {adjacentCols[0]} and {adjacentCols[1]}");
+        //Console.WriteLine($"Adjacent columns are {adjacentCols[0]} and {adjacentCols[1]}");
         foreach (int subCol in adjacentCols) {
             int clampedCol = AocReusableUtilities.AocReusableUtilities.Clamp(subCol, 0, arr[row].Length-1); //clamp the column number to be in bounds
-            Console.WriteLine($"Checking at ({row},{clampedCol})");
+            //Console.WriteLine($"Checking at ({row},{clampedCol})");
             char character = arr[row][clampedCol];
             if (IsSpecial(character)) //check if the char is a special character other than .
             {
@@ -233,7 +233,7 @@ class Day3
             
             for (int i = AocReusableUtilities.AocReusableUtilities.Clamp(startCol-1, 0, arr[row].Length-1); i < endCol + 1; i++)
             {
-                Console.WriteLine($"Checking at ({clampedRow},{i}); last is {endCol + 1}");
+                //Console.WriteLine($"Checking at ({clampedRow},{i}); last is {endCol + 1}");
                 char character = arr[clampedRow][i];
                 if (IsSpecial(character)) //check if the char is a special character other than .
                 {
