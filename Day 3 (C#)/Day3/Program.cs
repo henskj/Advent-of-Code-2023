@@ -71,11 +71,10 @@ class Day3
         }
         int ret = 0;
         List<char> chars;
-        foreach ((int,int) tup in numberStartIndices) {
-            //Console.WriteLine(tup);
+        foreach ((int r, int c) in numberStartIndices) {
             chars = [];
-            int row = tup.Item1;
-            int col = tup.Item2;
+            int row = r;
+            int col = c;
             while (Char.IsDigit(arr[row][col]))
             {
                 chars.Add(arr[row][col]);
