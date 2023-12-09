@@ -3,6 +3,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 
 public class Day5 {
     public static void main(String[] args) {
@@ -15,6 +16,8 @@ public class Day5 {
 
         if (args[1].equals("1")) {
             taskOne(file);
+        } else {
+            taskTwo(file);
         }
 
 
@@ -38,6 +41,48 @@ public class Day5 {
         }
     }
 
+    public static void taskTwo(File file) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            ArrayList<Long> sourceBase = getSeeds(reader);
+            ArrayList<ArrayList<Long>> source = new ArrayList<>();
+            for (int i = 0; i < sourceBase.size(); i += 2) {
+                ArrayList<Long> sourceRange = new ArrayList<>();
+                sourceRange.add(sourceBase.get(i));
+                sourceRange.add(sourceBase.get(i+1));
+                source.add(sourceRange);
+            }
+
+             //sort seeds in ascending order of start values
+            Collections.sort(source, Comparator.comparing(o -> o.get(0)));
+
+            //ArrayList<ArrayList<Long>> destination = getNextLayer(reader);
+            //sort the destinations the same way
+            //Collections.sort(destination, Comparator.comparing(o -> o.get(1)));
+
+            for (int i = 0; i < 7; i++) {
+                //the input always has 7 steps, so I feel comfortable hardcoding this
+                ArrayList<ArrayList<Long>> destination = getNextLayer(reader);
+                //sort the destinations the same way
+                Collections.sort(destination, Comparator.comparing(o -> o.get(1)));
+                source = processLayerRanges(source, destination);
+                Collections.sort(source, Comparator.comparing(o -> o.get(0)));
+                Collections.sort(destination, Comparator.comparing(o -> o.get(1)));
+            }
+
+            Long result = Long.MAX_VALUE;
+            for (ArrayList<Long> range : source) {
+                Long rangeMin = range.get(0);
+                if (rangeMin < result) {
+                    result = rangeMin;
+                }
+            }
+            System.out.println(result);
+        }
+
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public static ArrayList<ArrayList<Long>> getNextLayer(BufferedReader reader) {
         try {
             String line = reader.readLine();
@@ -84,7 +129,6 @@ public class Day5 {
     public static ArrayList<Long> processLayers(ArrayList<Long> source,
                                                   ArrayList<ArrayList<Long>> destination) {
         ArrayList<Long> newLayer = new ArrayList<>();
-
         for (Long sourceVal : source) {
             boolean assigned = false;
             for (ArrayList<Long> destLayer : destination) {
@@ -107,5 +151,75 @@ public class Day5 {
         }
         System.out.println();
         return newLayer;
+    }
+
+    public static ArrayList<ArrayList<Long>> processLayerRanges(ArrayList<ArrayList<Long>> origin,
+                                                    ArrayList<ArrayList<Long>> destination) {
+        ArrayList<ArrayList<Long>> retRanges = new ArrayList<>();
+        for (ArrayList<Long> originRange : origin) {
+            boolean added = false;
+            Long sourceStart = originRange.get(0);
+            Long sourceEnd = sourceStart + originRange.get(1);
+            for (ArrayList<Long> destLayer : destination) {
+                //initialise values
+                ArrayList<Long> layerRange = new ArrayList<>();
+                Long destSourceRangeStart = destLayer.get(1);
+                Long destStart = destLayer.get(0);
+                Long destLength = destLayer.get(2);
+                Long destSourceRangeEnd = destSourceRangeStart + destLength;
+                Long destPosEnd;
+                if (sourceEnd == sourceStart) {
+                    break; //we get here if in a previous run of the loop, the entire length of the range was used
+                }
+                if (sourceEnd < destSourceRangeStart || sourceStart > destSourceRangeEnd) {
+                    continue;
+                } else if (sourceStart >= destSourceRangeStart) {
+                    //we get here if the source range's start begins at or after the current layer's compatible values
+                    Long rangePosStart = Math.abs(sourceStart - destSourceRangeStart);
+                    Long destPosStart = destStart + rangePosStart;
+                    if (sourceEnd <= destSourceRangeEnd) {
+                        Long rangePosEnd = sourceEnd - sourceStart;
+                        destPosEnd = destPosStart + rangePosEnd;
+                        sourceStart = sourceEnd;
+                    } else {
+                        destPosEnd = destStart + destLength;
+                        sourceStart = destSourceRangeEnd;
+                    }
+                    layerRange.add(destPosStart);
+                    layerRange.add(destPosEnd - destPosStart);
+                    retRanges.add(layerRange);
+                    added = true;
+                } else {
+                    //otherwise, we get here
+                    ArrayList<Long> strippedRange = new ArrayList<>();
+                    strippedRange.add(sourceStart);
+                    strippedRange.add(destSourceRangeStart);
+                    retRanges.add(strippedRange);
+                    sourceStart = destSourceRangeStart;
+                    if (sourceEnd <= destSourceRangeEnd) {
+                        Long rangePosEnd = sourceEnd - sourceStart;
+                        destPosEnd = destStart + rangePosEnd;
+                        sourceStart = sourceEnd;
+                    } else {
+                        destPosEnd = destStart + destLength;
+                        sourceStart = destSourceRangeEnd;
+                    }
+                    layerRange.add(destStart);
+                    layerRange.add(destPosEnd - destStart);
+                    retRanges.add(layerRange);
+                    added = true;
+                }
+            }
+            if (!added) {
+                //we get here if there were no compatible values
+                retRanges.add(originRange);
+            } else if (sourceStart < sourceEnd) {
+                ArrayList<Long> layerRange = new ArrayList<>();
+                layerRange.add(sourceStart);
+                layerRange.add(sourceEnd - sourceStart);
+                retRanges.add(layerRange);
+            }
+        }
+        return retRanges;
     }
 }

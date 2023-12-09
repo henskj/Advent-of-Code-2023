@@ -228,7 +228,7 @@ class Day3
 
         int startCol = col; //first column index of our number, inclusive
         int endCol = col; //last column index of our number, exclusive
-        int[] subRows = [row-1, row+1]; //lets us iterate over the row above and below the current one. We check later whether these rows are out of bounds
+        int[] subRows = [row-1, row+1]; //lets us iterate over the row above and below the current one.
         //Console.WriteLine($"Beginning at ({row},{startCol})");
         while (Char.IsDigit(arr[row][endCol]))
         {
@@ -244,7 +244,7 @@ class Day3
         int[] adjacentCols = [startCol-1, endCol];
         //Console.WriteLine($"Adjacent columns are {adjacentCols[0]} and {adjacentCols[1]}");
         foreach (int subCol in adjacentCols) {
-            int clampedCol = AocReusableUtilities.AocReusableUtilities.Clamp(subCol, 0, arr[row].Length-1); //clamp the column number to be in bounds
+            int clampedCol = Math.Clamp(subCol, 0, arr[row].Length-1); //clamp the column number to be in bounds
             //Console.WriteLine($"Checking at ({row},{clampedCol})");
             char character = arr[row][clampedCol];
             if (IsSpecial(character)) //check if the char is a special character other than .
@@ -255,9 +255,9 @@ class Day3
         }
         foreach (int subRow in subRows)
         {
-            int clampedRow = AocReusableUtilities.AocReusableUtilities.Clamp(subRow, 0, arr.Length-1); //clamp the row number to be in bounds
+            int clampedRow = Math.Clamp(subRow, 0, arr.Length-1); //clamp the row number to be in bounds
             
-            for (int i = AocReusableUtilities.AocReusableUtilities.Clamp(startCol-1, 0, arr[row].Length-1); i < endCol + 1; i++)
+            for (int i = Math.Clamp(startCol-1, 0, arr[row].Length-1); i < endCol + 1; i++)
             {
                 //Console.WriteLine($"Checking at ({clampedRow},{i}); last is {endCol + 1}");
                 char character = arr[clampedRow][i];
@@ -272,8 +272,7 @@ class Day3
 
     public static bool IsSpecial(char character)
     {
-        int asciiVal = (int) character; //cast char to int to get ASCII value
-        if (!Char.IsDigit(character) && !Char.IsLetter(character) && asciiVal != 46)
+        if (!Char.IsDigit(character) && !Char.IsLetter(character) && character != '.')
         {
             return true;
         }
@@ -284,7 +283,7 @@ class Day3
     {
         //Check an asterisk in the array to see if it has exactly two adjacent numbers; if so, return those multiplied; otherwise, return 0
         int[] adjacentColumns = [col-1, col+1];
-        int[] subRows = [row-1, row+1]; //lets us iterate over the row above and below the current one. We check later whether these rows are out of bounds
+        int[] subRows = [row-1, row+1]; //lets us iterate over the row above and below the current one.
         List<(int,int)> numCoords = [];
         int numbersFound = 0; //we exit early if this exceeds 2
         foreach (int adj in adjacentColumns)
@@ -369,7 +368,7 @@ class Day3
                 break;
             }
         }
-        startCol = AocReusableUtilities.AocReusableUtilities.Clamp(startCol, 0, arr[row].Length); //clamp to bounds in case startCol is -1
+        startCol = Math.Clamp(startCol, 0, arr[row].Length); //clamp to bounds in case startCol is -1
 
         return startCol;
     }
@@ -391,7 +390,7 @@ class Day3
             }
         }
 
-        endCol = AocReusableUtilities.AocReusableUtilities.Clamp(endCol, 0, arr[row].Length - 1); //clamp to bounds in case endCol == length
+        endCol = Math.Clamp(endCol, 0, arr[row].Length - 1); //clamp to bounds in case endCol == length
 
         return endCol;
     }
