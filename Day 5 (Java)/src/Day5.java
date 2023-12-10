@@ -67,7 +67,6 @@ public class Day5 {
                 for (int p = 0; p < source.size(); p++) {
                     rangeSum += source.get(p).get(1);
                 }
-                System.out.printf("Layer %d\n",i);
                 Collections.sort(destination, Comparator.comparing(o -> o.get(1)));
                 source = processLayerRanges(source, destination);
                 Collections.sort(source, Comparator.comparing(o -> o.get(0)));
@@ -161,7 +160,6 @@ public class Day5 {
     public static ArrayList<ArrayList<Long>> processLayerRanges(ArrayList<ArrayList<Long>> origin,
                                                     ArrayList<ArrayList<Long>> destination) {
         ArrayList<ArrayList<Long>> retRanges = new ArrayList<>();
-        int i = 0;
         for (ArrayList<Long> originRange : origin) {
             boolean added = false;
             Long sourceStart = originRange.get(0);
@@ -188,9 +186,17 @@ public class Day5 {
                     //otherwise, we get here, where we strip off the beginning of the range
                     ArrayList<Long> strippedRange = new ArrayList<>();
                     strippedRange.add(sourceStart);
-                    strippedRange.add(destSourceRangeStart);
+                    strippedRange.add(destSourceRangeStart - sourceStart + 1);
                     retRanges.add(strippedRange);
+                    added = true;
+
                     sourceStart = destSourceRangeStart;
+
+                    if (sourceStart + 1 == sourceEnd) {
+                        //check for an off-by-1. surely there is a better way to do this
+                        sourceStart++;
+                        continue;
+                    }
 
                     layerRange = getRange(originRange, destLayer, sourceStart);
                     sourceStart = layerRange.get(2);
@@ -209,16 +215,6 @@ public class Day5 {
                 layerRange.add(sourceEnd - sourceStart);
                 retRanges.add(layerRange);
             }
-            long originSum = 0;
-            long newSum = 0;
-            for (int p = 0; p < origin.size(); p++) {
-                originSum += origin.get(p).get(1);
-            }
-            for (int p = 0; p < retRanges.size(); p++) {
-                newSum += retRanges.get(p).get(1);
-            }
-            System.out.printf("Old range sum in round %d: %d; new range sum %d\n",i,originSum,newSum);
-            i++;
         }
         return retRanges;
     }
@@ -226,7 +222,7 @@ public class Day5 {
     public static ArrayList<Long> getRange(ArrayList<Long> originRange, ArrayList<Long> destLayer, long sourceStart) {
         //reinitialise layers - will fix later
 
-        Long sourceEnd = sourceStart + originRange.get(1);
+        Long sourceEnd = originRange.get(0) + originRange.get(1);
         Long destSourceRangeStart = destLayer.get(1);
         Long destStart = destLayer.get(0);
         Long destLength = destLayer.get(2);
