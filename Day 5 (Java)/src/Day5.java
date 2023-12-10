@@ -165,24 +165,22 @@ public class Day5 {
         for (ArrayList<Long> originRange : origin) {
             boolean added = false;
             Long sourceStart = originRange.get(0);
-            Long sourceLength = sourceStart + originRange.get(1);
+            Long sourceEnd = sourceStart + originRange.get(1);
             for (ArrayList<Long> destLayer : destination) {
                 //initialise values
                 ArrayList<Long> layerRange;
                 Long destSourceRangeStart = destLayer.get(1);
                 Long destLength = destLayer.get(2);
                 Long destSourceRangeEnd = destSourceRangeStart + destLength;
-                if (sourceLength == sourceStart) {
+                if (sourceEnd == sourceStart) {
                     break; //we get here if in a previous run of the loop, the entire length of the range was used
                 }
-                if (sourceLength < destSourceRangeStart || sourceStart > destSourceRangeEnd) {
+                if (sourceEnd < destSourceRangeStart || sourceStart > destSourceRangeEnd) {
                     continue;
                 } else if (sourceStart >= destSourceRangeStart) {
-                    layerRange = getRange(originRange, destLayer, sourceStart, sourceLength);
+                    layerRange = getRange(originRange, destLayer, sourceStart);
                     //we get here if the source range's start begins at or after the current layer's compatible values
                     sourceStart = layerRange.get(2); //last item in list is updated sourceStart value
-                    sourceLength = layerRange.get(3);
-                    layerRange.remove(2);
                     layerRange.remove(2);
                     retRanges.add(layerRange);
                     added = true;
@@ -194,10 +192,8 @@ public class Day5 {
                     retRanges.add(strippedRange);
                     sourceStart = destSourceRangeStart;
 
-                    layerRange = getRange(originRange, destLayer, sourceStart, sourceLength);
-                    sourceStart = layerRange.get(2); //last item in list is updated sourceStart value
-                    sourceLength = layerRange.get(3);
-                    layerRange.remove(2);
+                    layerRange = getRange(originRange, destLayer, sourceStart);
+                    sourceStart = layerRange.get(2);
                     layerRange.remove(2);
 
                     retRanges.add(layerRange);
@@ -207,10 +203,10 @@ public class Day5 {
             if (!added) {
                 //we get here if there were no compatible values
                 retRanges.add(originRange);
-            } else if (sourceStart < sourceLength) {
+            } else if (sourceStart < sourceEnd) {
                 ArrayList<Long> layerRange = new ArrayList<>();
                 layerRange.add(sourceStart);
-                layerRange.add(sourceLength - sourceStart);
+                layerRange.add(sourceEnd - sourceStart);
                 retRanges.add(layerRange);
             }
             long originSum = 0;
@@ -227,10 +223,10 @@ public class Day5 {
         return retRanges;
     }
 
-    public static ArrayList<Long> getRange(ArrayList<Long> originRange, ArrayList<Long> destLayer, long sourceStart,
-                                           long sourceLength) {
+    public static ArrayList<Long> getRange(ArrayList<Long> originRange, ArrayList<Long> destLayer, long sourceStart) {
         //reinitialise layers - will fix later
 
+        Long sourceEnd = sourceStart + originRange.get(1);
         Long destSourceRangeStart = destLayer.get(1);
         Long destStart = destLayer.get(0);
         Long destLength = destLayer.get(2);
@@ -241,21 +237,17 @@ public class Day5 {
         Long destPosStart = destStart + rangePosStart;
 
         //actual logic here
-        long tmp;
-        if (sourceLength <= destSourceRangeEnd) {
-            Long rangePosEnd = sourceLength - sourceStart;
+        if (sourceEnd <= destSourceRangeEnd) {
+            Long rangePosEnd = sourceEnd - sourceStart;
             destPosEnd = destPosStart + rangePosEnd;
-            sourceStart = sourceLength;
+            sourceStart = sourceEnd;
         } else {
             destPosEnd = destStart + destLength;
-            tmp = destSourceRangeEnd;
-            long diff = tmp - sourceStart;
-            sourceLength = sourceLength - diff;
+            sourceStart = destSourceRangeEnd;
         }
         layerRange.add(destPosStart);
         layerRange.add(destPosEnd - destPosStart);
         layerRange.add(sourceStart);
-        layerRange.add(sourceLength);
         return layerRange;
     }
 }
