@@ -7,9 +7,7 @@ def getWins(time, dist):
         #the distance you get by spending i time accelerating
         velocity = i
         remainingTime = time - velocity
-        print(f"Checking velocity {velocity} against time {remainingTime} and distance {dist}")
         if velocity * remainingTime > dist:
-            print("Passed.")
             count += 1
     return count
 
@@ -32,6 +30,16 @@ def getLists(timeLine, distLine):
                 dists.append(int(distDigit))
                 distDigit = ""
     return times, dists
+
+def joinLists(times, dists):
+    time = ""
+    dist = ""
+    for i in range(len(times)):
+        time += str(times[i])
+        dist += str(dists[i])
+    time = int(time)
+    dist = int(dist)
+    return time, dist
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -59,6 +67,14 @@ if __name__ == "__main__":
 
             elif sys.argv[2] == "2":
                 print("Running task 2.")
+                timeLine = infile.readline()
+                distLine = infile.readline()
+                time, dist = getLists(timeLine, distLine)
+                time, dist = joinLists(time, dist)
+
+                print(time)
+                print(dist)
+                print(getWins(time, dist))
 
                 
                 
