@@ -7,6 +7,7 @@ namespace AocReusableUtilities
     {
         public static StreamReader OpenFileReader(string filePath)
         {
+            Console.WriteLine(System.IO.Directory.GetCurrentDirectory());
             if (string.IsNullOrEmpty(filePath))
             {
                 throw new ArgumentException("No file path provided.");

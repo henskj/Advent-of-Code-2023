@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": ".NET Core Launch (console)",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/Day 6 (C#)/bin/Debug/net8.0/Day 6 (C#).dll",
+            "args": ["1", "/home/henrik/Advent of Code 2023/Day 6 (C#)/testinput6.txt]"],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        }
+    ]
+}
