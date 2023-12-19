@@ -49,6 +49,16 @@ if __name__ == "__main__":
 
             elif sys.argv[2] == "2":
                 print("Running task 2.")
+                ret = 0
+                for line in infile.readlines():
+                    intLine = []
+                    for num in line.split():
+                        intLine.append(int(num))
+                    intLine = intLine[-1::-1]
+                    extrapolation = extrapolateDown([intLine])
+                    ret += extrapolation
+                print(ret)
+                
 
 
                 
