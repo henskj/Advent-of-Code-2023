@@ -43,6 +43,26 @@ def findGalaxyCoords(universe):
 def shortestPath(universe, origin, destination):
     return abs(origin[0] - destination[0]) + abs(origin[1] - destination[1])
 
+def shortestMillionPath(universe, origin, destination, markedRows, markedCols):
+    lowR = min(origin[0], destination[0])
+    highR = max(origin[0], destination[0])
+
+    lowC = min(origin[1], destination[1])
+    highC = max(origin[1], destination[1])
+
+    ret = 0
+
+    for r in range(lowR,highR):
+        ret += 1
+        if r in markedRows:
+            ret += 999999
+    for c in range(lowC,highC):
+        ret += 1
+        if c in markedCols:
+            ret += 999999
+            
+    return ret
+
 if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Please provide a filepath and a task number.")
@@ -80,3 +100,40 @@ if __name__ == "__main__":
 
             elif sys.argv[2] == "2":
                 print("Running task 2.")
+                universe = []
+                for line in infile:
+                    line = line[0:-1]
+                    universe.append(list(line))
+                markedRows = markRows(universe)
+                markedCols = markCols(universe)
+                
+                """
+                count = 0
+                for i in range(len(markedRows)):
+                    r = markedRows[i]
+                    markedRows[i] = r+count
+                    count += 1
+                    
+                count = 0
+                for i in range(len(markedCols)):
+                    c = markedCols[i]
+                    markedCols[i] = c+count
+                    count += 1
+                """
+                #universe = expandUniverse(universe,markedRows,markedCols)
+                galaxyCoords = findGalaxyCoords(universe)
+
+                print(markedRows)
+                print(markedCols)
+                distances = []
+                for i in range(len(galaxyCoords)):
+                    for p in range(i+1,len(galaxyCoords)):
+                        fromGal = galaxyCoords[i]
+                        toGal = galaxyCoords[p]
+                        distances.append(shortestMillionPath(universe, fromGal,
+                                                             toGal, markedRows,
+                                                             markedCols))
+                
+
+
+                print(sum(distances))
