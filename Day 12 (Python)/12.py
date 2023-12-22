@@ -28,10 +28,7 @@ def mapRecursive(index, row, values, count):
     if values == []:
         return count + 1
     if index + values[0] > len(row):
-        if len(values) != 1 or values[0] != 1:
-            return count
-        if row[-1] == "#" or row[-1] == "?":
-            return count + 1
+        return count
     if row[index] == "#" or row[index] == "?":
         if values[0] > 1:
             values[0] -= 1
